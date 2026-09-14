@@ -1,0 +1,32 @@
+# Push a tag like v0.1.0 and this builds Knitted-<version>.dmg and attaches it to a GitHub Release.
+# The tag must match CFBundleShortVersionString in Resources/Info.plist.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches app version
+        run: |
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Resources/Info.plist)
+          if [[ "v$VERSION" != "$GITHUB_REF_NAME" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match Info.plist version $VERSION"
+            exit 1
+          fi
+
+      - name: Build DMG
+        run: scripts/make-dmg.sh
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" build/Knitted-*.dmg --title "Knitted ${GITHUB_REF_NAME#v}" --generate-notes

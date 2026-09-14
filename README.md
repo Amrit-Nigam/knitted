@@ -4,6 +4,21 @@ Knitted sweaters for your Mac's folders. Drop a folder on the app and it gets a 
 knitted out of yarn: a macOS-style folder with a patterned pocket, a ribbed cuff, and a sheet
 of paper peeking out.
 
+## Install
+
+1. Download the latest `Knitted-x.y.z.dmg` from [Releases](https://github.com/Amrit-Nigam/knitted/releases/latest).
+2. Open it and drag **Knitted** onto **Applications**.
+3. Open Knitted. It isn't signed with an Apple Developer ID, so the first launch is blocked with
+   a warning. Either:
+   - open **System Settings → Privacy & Security**, scroll down, click **Open Anyway** next to
+     Knitted, and confirm; or
+   - run this in Terminal once:
+     ```sh
+     xattr -dr com.apple.quarantine /Applications/Knitted.app
+     ```
+
+Needs macOS 14 Sonoma or later, on Apple silicon or Intel.
+
 ## Using it
 
 1. **Add folders**: drop them onto the window or the Dock icon, or click **Choose Folders…** (⌘O). They wait in the basket; nothing changes yet.
@@ -26,10 +41,21 @@ Needs macOS 14+ and Swift 5.9+. The Command Line Tools are enough; Xcode is not 
 
 ```sh
 scripts/build-app.sh                 # -> build/Knitted.app (ad-hoc signed, knitted app icon)
+scripts/make-dmg.sh                  # -> build/Knitted-<version>.dmg (universal)
 open "build/Knitted.app"
 scripts/test.sh                      # unit tests (swift-testing)
 swift run knit-preview preview/      # render folder icons to PNG
 ```
+
+## Releasing
+
+Bump `CFBundleShortVersionString` in `Resources/Info.plist`, commit, then tag and push:
+
+```sh
+git tag v0.1.0 && git push origin v0.1.0
+```
+
+The [Release workflow](.github/workflows/release.yml) builds the DMG and publishes it as a GitHub Release.
 
 ## Layout
 
