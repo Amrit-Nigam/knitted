@@ -52,7 +52,7 @@ public struct KnitPattern: Equatable, Sendable {
     public let rows: Int
     public let cells: [KnitCell]  // row-major, row 0 at the top
     /// Shift odd rows by half a stitch to break up grid regularity. Off for anything whose
-    /// look depends on straight columns (ribbing, cables, seed).
+    /// look depends on straight columns (ribbing, cables, seed) or on a colourwork chart.
     public let offsetsAlternateRows: Bool
 
     public init(id: String, columns: Int, rows: Int, offsetsAlternateRows: Bool, cell: (_ column: Int, _ row: Int) -> KnitCell) {
@@ -109,7 +109,7 @@ public struct KnitPattern: Equatable, Sendable {
             "...#....",
             ".......o",
         ].map { Array($0) }
-        return KnitPattern(id: "fairIsle", columns: 8, rows: 8, offsetsAlternateRows: true) { column, row in
+        return KnitPattern(id: "fairIsle", columns: 8, rows: 8, offsetsAlternateRows: false) { column, row in
             switch chart[row][column] {
             case "#": return KnitCell(1)
             case "o": return KnitCell(2)
@@ -124,7 +124,7 @@ public struct KnitPattern: Equatable, Sendable {
     }
 
     /// Diamonds in two colours with a dashed diagonal lattice in a third.
-    public static let argyle = KnitPattern(id: "argyle", columns: 12, rows: 16, offsetsAlternateRows: true) { column, row in
+    public static let argyle = KnitPattern(id: "argyle", columns: 12, rows: 16, offsetsAlternateRows: false) { column, row in
         // Lattice: two diagonals crossing at each diamond's centre, one stitch wide per row.
         let v = (Double(row) + 0.5) / 16  // 0..<1 down the repeat
         let falling = Int(v * 12) % 12

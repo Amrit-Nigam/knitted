@@ -2,18 +2,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "CozyBorders",
+    name: "CozyFolders",
     platforms: [.macOS(.v14)],
     products: [
-        .executable(name: "CozyBorders", targets: ["CozyBorders"]),
+        .executable(name: "CozyFolders", targets: ["CozyFolders"]),
         .executable(name: "knit-preview", targets: ["knit-preview"]),
     ],
     targets: [
-        // Pure, testable pieces: coordinate maths, filtering, knitting, palettes.
+        // The knitting: stitches, patterns, swatches, yarn palettes and the folder icon.
         .target(name: "KnitCore"),
-        // The menu bar agent: tracking, border windows, stacking, preferences.
-        .executableTarget(name: "CozyBorders", dependencies: ["KnitCore"]),
-        // Renders swatches, a mock bordered window and icon palettes to PNG for eyeballing.
+        // The app: drop folders on it and they get knitted icons.
+        .executableTarget(name: "CozyFolders", dependencies: ["KnitCore"]),
+        // Renders folder icons to PNG for judging the knit by eye.
         .executableTarget(name: "knit-preview", dependencies: ["KnitCore"]),
         .testTarget(name: "KnitCoreTests", dependencies: ["KnitCore"]),
     ]

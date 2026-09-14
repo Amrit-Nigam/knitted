@@ -7,14 +7,9 @@ public struct SampledPixel: Equatable, Sendable {
     public var alpha: Double
 }
 
-/// Turns an app icon into a small grid of raw pixels. Sampling icons needs no permission.
+/// Turns an image (an icon, a wallpaper) into a small grid of raw pixels.
 public enum IconSampler {
     public static let sampleSize = 32
-
-    public static func pixels(forPID pid: pid_t) -> [SampledPixel]? {
-        guard let icon = NSRunningApplication(processIdentifier: pid)?.icon else { return nil }
-        return pixels(for: icon)
-    }
 
     public static func pixels(for image: NSImage) -> [SampledPixel]? {
         var rect = CGRect(x: 0, y: 0, width: 256, height: 256)

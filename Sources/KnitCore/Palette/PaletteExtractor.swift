@@ -1,4 +1,5 @@
 import Foundation
+import ImageIO
 
 /// Four yarns: three ranked colours drawn from the icon, and a quieter background yarn.
 public struct YarnPalette: Equatable, Hashable, Codable, Sendable {
@@ -38,8 +39,15 @@ public enum PaletteExtractor {
         var population: Int
     }
 
-    public static func palette(forPID pid: pid_t) -> YarnPalette {
-        guard let pixels = IconSampler.pixels(forPID: pid) else { return .undyed }
+    /// Yarns sampled from any image — used to match a folder to the desktop wallpaper.
+    public static func palette(fromImageAt url: URL) -> YarnPalette? {
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                  kCGImageSourceCreateThumbnailFromImageAlways: true,
+                  kCGImageSourceThumbnailMaxPixelSize: 256,
+              ] as CFDictionary),
+              let pixels = IconSampler.pixels(for: image)
+        else { return nil }
         return palette(from: pixels)
     }
 
@@ -174,26 +182,4 @@ public enum PaletteExtractor {
         }
         return merged
     }
-}
-
-/// Palettes per bundle identifier. Icons change rarely; invalidate when the app relaunches.
-public final class PaletteCache {
-    private var palettes: [String: YarnPalette] = [:]
-
-    public init() {}
-
-    public func palette(bundleID: String?, pid: pid_t) -> YarnPalette {
-        let key = bundleID ?? "pid:\(pid)"
-        if let cached = palettes[key] { return cached }
-        let palette = PaletteExtractor.palette(forPID: pid)
-        palettes[key] = palette
-        return palette
-    }
-
-    public func invalidate(bundleID: String?) {
-        guard let bundleID else { return }
-        palettes[bundleID] = nil
-    }
-
-    public func removeAll() { palettes.removeAll() }
 }
