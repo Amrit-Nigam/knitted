@@ -1,4 +1,4 @@
-# Knitted
+<p align="center"><img src="assets/banner.png" alt="Knitted" width="720"></p>
 
 Knitted sweaters for your Mac's folders. Drop a folder on the app and it gets a custom icon
 knitted out of yarn: a macOS-style folder with a patterned pocket, a ribbed cuff, and a sheet

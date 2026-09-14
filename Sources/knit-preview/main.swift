@@ -8,6 +8,7 @@ import UniformTypeIdentifiers
 //
 //   swift run knit-preview <output-dir>
 //   swift run knit-preview iconset <AppIcon.iconset>   (used by scripts/build-app.sh)
+//   swift run knit-preview banner <banner.png>          (logo + wordmark, for the README)
 
 if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "iconset" {
     let dir = URL(fileURLWithPath: CommandLine.arguments[2])
@@ -21,6 +22,43 @@ if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "iconset" {
             CGImageDestinationFinalize(dest)
         }
     }
+    exit(0)
+}
+
+if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "banner" {
+    let (width, height) = (2400, 800)
+    let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+                        space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    let cream = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB)!,
+                           colors: [YarnColor(hex: "#FBF2DC")!.cgColor, YarnColor(hex: "#F1DFB6")!.cgColor] as CFArray,
+                           locations: [0, 1])!
+    ctx.drawLinearGradient(cream, start: CGPoint(x: 0, y: height), end: .zero, options: [])
+
+    let iconSize = 640
+    let icon = AppIconRenderer.image(pixelSize: iconSize)!
+
+    let font = NSFont.systemFont(ofSize: 300, weight: .heavy)
+    let rounded = font.fontDescriptor.withDesign(.rounded).flatMap { NSFont(descriptor: $0, size: 300) } ?? font
+    let word = NSAttributedString(string: "Knitted", attributes: [
+        .font: rounded, .foregroundColor: NSColor(srgbRed: 0x5A / 255, green: 0x40 / 255, blue: 0x2E / 255, alpha: 1),
+        .kern: -4,
+    ])
+    let line = CTLineCreateWithAttributedString(word)
+    let bounds = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
+
+    let gap: CGFloat = 60
+    let total = CGFloat(iconSize) + gap + bounds.width
+    let left = (CGFloat(width) - total) / 2
+    ctx.draw(icon, in: CGRect(x: left, y: CGFloat(height - iconSize) / 2, width: CGFloat(iconSize), height: CGFloat(iconSize)))
+    ctx.textPosition = CGPoint(x: left + CGFloat(iconSize) + gap - bounds.minX,
+                               y: CGFloat(height) / 2 - bounds.midY)
+    CTLineDraw(line, ctx)
+
+    let url = URL(fileURLWithPath: CommandLine.arguments[2])
+    let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)!
+    CGImageDestinationAddImage(dest, ctx.makeImage()!, nil)
+    CGImageDestinationFinalize(dest)
+    print("wrote \(url.path)")
     exit(0)
 }
 

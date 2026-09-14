@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   dmg:
-    runs-on: macos-15
+    runs-on: macos-26  # the app uses macOS 26 SDK APIs (behind #available)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check tag matches app version
         run: |
