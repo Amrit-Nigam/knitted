@@ -1,38 +1,68 @@
 import Foundation
 
 public enum PatternID: String, CaseIterable, Codable, Sendable {
-    case stripes
+    // Colourwork
     case fairIsle
-    case seed
+    case nordicStar
+    case hearts
+    case trees
     case argyle
-    case cable
-    /// Plain knit in the lead yarn. Not auto-assigned; available as an override.
+    // Stripes & checks
+    case stripes
+    case gingham
+    case houndstooth
+    case chevron
+    case polkaDots
+    // Texture
     case stockinette
+    case seed
+    case rib
+    case basketweave
+    case cable
 
-    /// The patterns handed out automatically by bundle-identifier hash.
-    public static let autoAssigned: [PatternID] = [.stripes, .fairIsle, .seed, .argyle, .cable]
+    public enum Family: String, CaseIterable, Sendable {
+        case colourwork = "Colourwork"
+        case geometric = "Stripes & Checks"
+        case texture = "Texture"
+    }
+
+    public var family: Family {
+        switch self {
+        case .fairIsle, .nordicStar, .hearts, .trees, .argyle: return .colourwork
+        case .stripes, .gingham, .houndstooth, .chevron, .polkaDots: return .geometric
+        case .stockinette, .seed, .rib, .basketweave, .cable: return .texture
+        }
+    }
 
     public var displayName: String {
         switch self {
-        case .stripes: return "Stripes"
         case .fairIsle: return "Fair Isle"
-        case .seed: return "Seed Stitch"
+        case .nordicStar: return "Nordic Star"
+        case .hearts: return "Hearts"
+        case .trees: return "Pine Trees"
         case .argyle: return "Argyle"
-        case .cable: return "Cable"
+        case .stripes: return "Stripes"
+        case .gingham: return "Gingham"
+        case .houndstooth: return "Houndstooth"
+        case .chevron: return "Chevron"
+        case .polkaDots: return "Polka Dots"
         case .stockinette: return "Stockinette"
+        case .seed: return "Seed Stitch"
+        case .rib: return "Rib"
+        case .basketweave: return "Basketweave"
+        case .cable: return "Cable"
         }
     }
 
-    /// Deterministic per-app pattern: FNV-1a of the bundle identifier, modulo the pattern
-    /// count. Swift's `hashValue` is seeded per launch, so it can't be used here.
-    public static func assigned(toBundleID bundleID: String) -> PatternID {
-        var hash: UInt64 = 0xCBF2_9CE4_8422_2325
-        for byte in bundleID.utf8 {
-            hash ^= UInt64(byte)
-            hash = hash &* 0x0000_0100_0000_01B3
-        }
-        return autoAssigned[Int(hash % UInt64(autoAssigned.count))]
+    /// Patterns handed out by "Surprise". Plain stockinette is left out; it's no surprise.
+    public static let surprisePool: [PatternID] = allCases.filter { $0 != .stockinette }
+
+    /// A stable pattern for a name: the same folder always gets the same surprise.
+    public static func assigned(to name: String) -> PatternID {
+        surprisePool[Int(StableHash.fnv1a(name) % UInt64(surprisePool.count))]
     }
+
+    public var pattern: KnitPattern { PatternLibrary.pattern(for: self) }
 }
 
 public struct KnitCell: Equatable, Sendable {
@@ -55,7 +85,8 @@ public struct KnitPattern: Equatable, Sendable {
     /// look depends on straight columns (ribbing, cables, seed) or on a colourwork chart.
     public let offsetsAlternateRows: Bool
 
-    public init(id: String, columns: Int, rows: Int, offsetsAlternateRows: Bool, cell: (_ column: Int, _ row: Int) -> KnitCell) {
+    public init(id: String, columns: Int, rows: Int, offsetsAlternateRows: Bool = false,
+                cell: (_ column: Int, _ row: Int) -> KnitCell) {
         precondition(!offsetsAlternateRows || rows % 2 == 0, "offset patterns need an even row repeat to tile")
         self.id = id
         self.columns = columns
@@ -68,6 +99,17 @@ public struct KnitPattern: Equatable, Sendable {
         self.cells = cells
     }
 
+    /// Builds a pattern from a colourwork chart, top row first. Every character maps to a
+    /// cell through `key`; all rows must be the same width.
+    public init(id: String, chart: [String], key: [Character: KnitCell]) {
+        let grid = chart.map(Array.init)
+        precondition(Set(grid.map(\.count)).count == 1, "chart rows for \(id) differ in width")
+        self.init(id: id, columns: grid[0].count, rows: grid.count) { column, row in
+            guard let cell = key[grid[row][column]] else { preconditionFailure("no key for '\(grid[row][column])' in \(id)") }
+            return cell
+        }
+    }
+
     /// Wrapping lookup, so neighbours across the repeat boundary resolve correctly.
     public subscript(column: Int, row: Int) -> KnitCell {
         let c = ((column % columns) + columns) % columns
@@ -75,80 +117,6 @@ public struct KnitPattern: Equatable, Sendable {
         return cells[r * columns + c]
     }
 
-    public static func named(_ id: PatternID) -> KnitPattern {
-        switch id {
-        case .stripes: return stripes
-        case .fairIsle: return fairIsle
-        case .seed: return seed
-        case .argyle: return argyle
-        case .cable: return cable
-        case .stockinette: return stockinette
-        }
-    }
-
-    // MARK: Definitions
-
-    public static let stockinette = KnitPattern(id: "stockinette", columns: 1, rows: 2, offsetsAlternateRows: true) { _, _ in
-        KnitCell(0)
-    }
-
-    /// Horizontal bands, three rows per colour.
-    public static let stripes = KnitPattern(id: "stripes", columns: 1, rows: 6, offsetsAlternateRows: true) { _, row in
-        KnitCell(row < 3 ? 0 : 1)
-    }
-
-    /// A small diamond with a dot between repeats, knitted over the lead yarn.
-    public static let fairIsle: KnitPattern = {
-        let chart = [
-            "...#....",
-            "..#.#...",
-            ".#...#..",
-            "#..o..#.",
-            ".#...#..",
-            "..#.#...",
-            "...#....",
-            ".......o",
-        ].map { Array($0) }
-        return KnitPattern(id: "fairIsle", columns: 8, rows: 8, offsetsAlternateRows: false) { column, row in
-            switch chart[row][column] {
-            case "#": return KnitCell(1)
-            case "o": return KnitCell(2)
-            default: return KnitCell(0)
-            }
-        }
-    }()
-
-    /// Alternating knit and purl, single colour — all texture.
-    public static let seed = KnitPattern(id: "seed", columns: 2, rows: 2, offsetsAlternateRows: false) { column, row in
-        KnitCell(0, (column + row) % 2 == 0 ? .knit : .purl)
-    }
-
-    /// Diamonds in two colours with a dashed diagonal lattice in a third.
-    public static let argyle = KnitPattern(id: "argyle", columns: 12, rows: 16, offsetsAlternateRows: false) { column, row in
-        // Lattice: two diagonals crossing at each diamond's centre, one stitch wide per row.
-        let v = (Double(row) + 0.5) / 16  // 0..<1 down the repeat
-        let falling = Int(v * 12) % 12
-        let rising = (11 - Int(v * 12)) % 12
-        if column == falling || column == rising { return KnitCell(2) }
-        let u = (Double(column) + 0.5) / 6
-        let inDiamond = abs(u - 1) + abs(v * 2 - 1) <= 1
-        return KnitCell(inDiamond ? 0 : 3)
-    }
-
-    /// A four-stitch rope cable between purl gutters. Geometry, not colour.
-    public static let cable = KnitPattern(id: "cable", columns: 6, rows: 12, offsetsAlternateRows: false) { column, row in
-        switch column {
-        case 0, 5:
-            return KnitCell(0, .purl)
-        default:
-            guard row < 4 else { return KnitCell(0) }
-            // During the crossing the left pair travels right, in front of the right pair.
-            return KnitCell(0, column <= 2 ? .cableRight : .cableLeft)
-        }
-    }
-
-    /// 1×1 ribbing: alternating columns of knit and purl. Used for cuffs.
-    public static let ribbing = KnitPattern(id: "ribbing", columns: 2, rows: 2, offsetsAlternateRows: false) { column, _ in
-        KnitCell(0, column == 0 ? .knit : .purl)
-    }
+    /// Palette indices this pattern actually uses.
+    public var colorIndices: Set<Int> { Set(cells.map(\.colorIndex)) }
 }

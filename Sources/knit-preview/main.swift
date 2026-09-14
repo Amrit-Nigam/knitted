@@ -12,10 +12,9 @@ import UniformTypeIdentifiers
 if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "iconset" {
     let dir = URL(fileURLWithPath: CommandLine.arguments[2])
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    let sweater = FolderSweater(pattern: .fairIsle, palette: YarnPreset.named("finder")!.palette)
     for points in [16, 32, 128, 256, 512] {
         for scale in [1, 2] {
-            let image = FolderIconRenderer.image(for: sweater, pixelSize: points * scale)!
+            let image = AppIconRenderer.image(pixelSize: points * scale)!
             let name = scale == 1 ? "icon_\(points)x\(points).png" : "icon_\(points)x\(points)@2x.png"
             let dest = CGImageDestinationCreateWithURL(dir.appendingPathComponent(name) as CFURL, UTType.png.identifier as CFString, 1, nil)!
             CGImageDestinationAddImage(dest, image, nil)
@@ -59,12 +58,12 @@ func label(_ text: String, centeredAt point: CGPoint, in ctx: CGContext, size: C
     CTLineDraw(line, ctx)
 }
 
-let sheet = makeContext(width: 256 * PatternID.allCases.count, height: 256 * 4, background: YarnColor(hex: "#F4EEE2")!.cgColor)
 let presets = ["finder", "forest", "berry", "charcoal"].compactMap(YarnPreset.named)
+let sheet = makeContext(width: 200 * PatternID.allCases.count, height: 200 * presets.count, background: YarnColor(hex: "#F4EEE2")!.cgColor)
 for (row, preset) in presets.enumerated() {
     for (column, pattern) in PatternID.allCases.enumerated() {
-        let icon = FolderIconRenderer.image(for: FolderSweater(pattern: pattern, palette: preset.palette), pixelSize: 256)!
-        sheet.draw(icon, in: CGRect(x: column * 256, y: (3 - row) * 256, width: 256, height: 256))
+        let icon = FolderIconRenderer.image(for: FolderSweater(pattern: pattern, palette: preset.palette), pixelSize: 200)!
+        sheet.draw(icon, in: CGRect(x: column * 200, y: (presets.count - 1 - row) * 200, width: 200, height: 200))
     }
 }
 save(sheet.makeImage()!, "folders-sheet.png")
@@ -88,3 +87,5 @@ for (i, sweater) in sweaters.enumerated() {
     desktop.draw(big, in: CGRect(x: 300, y: y - 60, width: 256, height: 256))
 }
 save(desktop.makeImage()!, "desktop.png")
+
+save(AppIconRenderer.image(pixelSize: 1024)!, "app-icon.png")

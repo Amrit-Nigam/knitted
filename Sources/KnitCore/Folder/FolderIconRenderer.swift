@@ -75,7 +75,7 @@ public enum FolderIconRenderer {
         ctx.fillPath()
         ctx.restoreGState()
         let backYarn = YarnPalette(colors: Array(repeating: lead.shaded(-0.22), count: 4))
-        fill(backShape, with: .stockinette, palette: backYarn, origin: CGPoint(x: back.minX, y: tab.minY), k: k, in: ctx)
+        fill(backShape, with: PatternLibrary.stockinette, palette: backYarn, origin: CGPoint(x: back.minX, y: tab.minY), k: k, in: ctx)
         rim(backShape, in: ctx, alpha: 0.3)
 
         // Paper peeking out of the pocket.
@@ -109,7 +109,7 @@ public enum FolderIconRenderer {
 
         let cuffBottom = front.minY + (sweater.hasCuff ? cuffDepth : 0)
         let body = frontShape.intersection(CGPath(rect: CGRect(x: 0, y: cuffBottom, width: canvas, height: canvas), transform: nil))
-        fill(body, with: .named(sweater.pattern), palette: palette, origin: CGPoint(x: front.minX + stitch.width / 2, y: cuffBottom), k: k, in: ctx)
+        fill(body, with: sweater.pattern.pattern, palette: palette, origin: CGPoint(x: front.minX + stitch.width / 2, y: cuffBottom), k: k, in: ctx)
 
         if sweater.hasCuff {
             // Ribbed hem in the darkest yarn, flaring a touch past the pocket like a sweater cuff.
@@ -122,7 +122,7 @@ public enum FolderIconRenderer {
             ctx.setFillColor(cuffYarn.primary.shaded(-0.3).cgColor)
             ctx.fillPath()
             ctx.restoreGState()
-            fill(cuff, with: .ribbing, palette: cuffYarn, origin: CGPoint(x: cuffRect.minX + 6, y: cuffRect.minY + 4), k: k, in: ctx)
+            fill(cuff, with: PatternLibrary.ribbing, palette: cuffYarn, origin: CGPoint(x: cuffRect.minX + 6, y: cuffRect.minY + 4), k: k, in: ctx)
             rim(cuff, in: ctx, alpha: 0.32)
             // A little light catching the rolled top edge.
             ctx.saveGState()
@@ -180,7 +180,7 @@ public enum FolderIconRenderer {
         ctx.restoreGState()
     }
 
-    static func cuffColor(for palette: YarnPalette) -> YarnColor {
+    public static func cuffColor(for palette: YarnPalette) -> YarnColor {
         // The darkest yarn, unless it's barely different from the pocket — then deepen the lead.
         let darkest = palette.darkest
         return darkest.deltaE(palette.primary) < 12 ? palette.primary.shaded(-0.3) : darkest
