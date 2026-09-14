@@ -2,7 +2,7 @@ import KnitCore
 import SwiftUI
 
 /// Warm paper, brown ink, terracotta accent.
-enum Cozy {
+enum Theme {
     static let cream = Color(hex: "#EFE6D6")
     static let paper = Color(hex: "#FBF7EF")
     static let card = Color(hex: "#FFFDF8")
@@ -30,7 +30,7 @@ extension YarnColor {
     }
 }
 
-struct CozyButtonStyle: ButtonStyle {
+struct KnitButtonStyle: ButtonStyle {
     enum Kind { case primary, secondary }
     var kind: Kind = .secondary
     var fullWidth = false
@@ -42,9 +42,9 @@ struct CozyButtonStyle: ButtonStyle {
             .frame(maxWidth: fullWidth ? .infinity : nil)
             .padding(.horizontal, kind == .primary ? 18 : 12)
             .padding(.vertical, kind == .primary ? 10 : 6)
-            .foregroundStyle(kind == .primary ? Color.white : Cozy.ink)
+            .foregroundStyle(kind == .primary ? Color.white : Theme.ink)
             .background(
-                Capsule().fill(kind == .primary ? Cozy.accent : Cozy.stitch.opacity(0.32))
+                Capsule().fill(kind == .primary ? Theme.accent : Theme.stitch.opacity(0.32))
             )
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.45)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
@@ -67,7 +67,7 @@ struct StitchedDivider: View {
                     p.addLine(to: CGPoint(x: geo.size.width, y: geo.size.height / 2))
                 }
             }
-            .stroke(Cozy.stitch, style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [6, 6]))
+            .stroke(Theme.stitch, style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [6, 6]))
         }
         .frame(width: vertical ? 2 : nil, height: vertical ? nil : 2)
     }
@@ -82,11 +82,11 @@ struct SectionHeader: View {
             Text(title.uppercased())
                 .font(.system(size: 11, weight: .bold))
                 .tracking(1.2)
-                .foregroundStyle(Cozy.softInk)
+                .foregroundStyle(Theme.softInk)
             if let subtitle {
                 Text(subtitle)
                     .font(.system(size: 11))
-                    .foregroundStyle(Cozy.softInk.opacity(0.8))
+                    .foregroundStyle(Theme.softInk.opacity(0.8))
             }
         }
     }

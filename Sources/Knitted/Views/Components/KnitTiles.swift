@@ -85,11 +85,11 @@ struct ChoiceTile<Preview: View>: View {
             .padding(7)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(selected ? Cozy.card : Cozy.card.opacity(0.5))
+                    .fill(selected ? Theme.card : Theme.card.opacity(0.5))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(selected ? Cozy.accent : Cozy.stitch.opacity(0.5), lineWidth: selected ? 2 : 1)
+                    .strokeBorder(selected ? Theme.accent : Theme.stitch.opacity(0.5), lineWidth: selected ? 2 : 1)
             )
             .contentShape(Rectangle())
         }
@@ -104,14 +104,14 @@ struct ToastView: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: toast.kind == .done ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
-                .foregroundStyle(toast.kind == .done ? Cozy.accent : Cozy.warning)
+                .foregroundStyle(toast.kind == .done ? Theme.accent : Theme.warning)
             Text(toast.message)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Cozy.ink)
+                .foregroundStyle(Theme.ink)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
-        .background(Capsule().fill(Cozy.card).shadow(color: .black.opacity(0.15), radius: 8, y: 3))
-        .overlay(Capsule().strokeBorder(Cozy.stitch.opacity(0.6), lineWidth: 1))
+        .background(Capsule().fill(Theme.card).shadow(color: .black.opacity(0.15), radius: 8, y: 3))
+        .overlay(Capsule().strokeBorder(Theme.stitch.opacity(0.6), lineWidth: 1))
     }
 }

@@ -28,7 +28,7 @@ private struct DetailsSection: View {
             SectionHeader(title: "Details")
             Toggle("Ribbed cuff along the pocket", isOn: $studio.design.hasCuff)
                 .toggleStyle(.switch)
-                .tint(Cozy.accent)
+                .tint(Theme.accent)
                 .font(.system(size: 13))
         }
     }
@@ -42,7 +42,7 @@ private struct ApplyBar: View {
         VStack(alignment: .leading, spacing: 10) {
             Text("\(studio.design.patternLabel) in \(studio.design.yarnLabel)")
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Cozy.softInk)
+                .foregroundStyle(Theme.softInk)
                 .lineLimit(1)
             Button {
                 studio.apply()
@@ -50,7 +50,7 @@ private struct ApplyBar: View {
                 Label(count == 0 ? "Add folders to knit" : "Knit \(count) Sweater\(count == 1 ? "" : "s")",
                       systemImage: "scissors")
             }
-            .buttonStyle(CozyButtonStyle(kind: .primary, fullWidth: true))
+            .buttonStyle(KnitButtonStyle(kind: .primary, fullWidth: true))
             .disabled(count == 0)
             .help("⌘↩")
         }

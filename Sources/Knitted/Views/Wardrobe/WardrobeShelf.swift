@@ -11,10 +11,10 @@ struct WardrobeShelf: View {
                 SectionHeader(title: "Wearing sweaters", subtitle: "\(studio.wardrobe.count)")
                 Spacer()
                 Button("Change All") { studio.restage(studio.wardrobe) }
-                    .buttonStyle(CozyButtonStyle())
+                    .buttonStyle(KnitButtonStyle())
                     .help("Put every knitted folder back in the basket to pick a new sweater")
                 Button("Take All Off") { studio.unknitAll() }
-                    .buttonStyle(CozyButtonStyle())
+                    .buttonStyle(KnitButtonStyle())
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
@@ -46,7 +46,7 @@ private struct WardrobeItem: View {
                         Button { studio.unknit(folder) } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 15))
-                                .foregroundStyle(Cozy.ink, Cozy.card)
+                                .foregroundStyle(Theme.ink, Theme.card)
                         }
                         .buttonStyle(.plain)
                         .help("Take the sweater off")

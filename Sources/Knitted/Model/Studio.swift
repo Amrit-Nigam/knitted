@@ -114,7 +114,7 @@ final class Studio {
         focusedID = failed.first?.id
 
         if !failed.isEmpty {
-            show("Couldn't change \(failed.map(\.name).joined(separator: ", ")). Check Cozy Folders is allowed to access it.", .warning)
+            show("Couldn't change \(failed.map(\.name).joined(separator: ", ")). Check Knitted is allowed to access it.", .warning)
         } else if done.contains(where: \.isGitRepository) {
             show("Knitted! Git will notice a hidden “Icon” file — add Icon? to .gitignore", .warning)
         } else {

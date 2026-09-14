@@ -1,4 +1,4 @@
-# Cozy Folders
+# Knitted
 
 Knitted sweaters for your Mac's folders. Drop a folder on the app and it gets a custom icon
 knitted out of yarn: a macOS-style folder with a patterned pocket, a ribbed cuff, and a sheet
@@ -25,8 +25,8 @@ git repository that file shows up as untracked, so add `Icon?` to your `.gitigno
 Needs macOS 14+ and Swift 5.9+. The Command Line Tools are enough; Xcode is not required.
 
 ```sh
-scripts/build-app.sh                 # -> build/Cozy Folders.app (ad-hoc signed, knitted app icon)
-open "build/Cozy Folders.app"
+scripts/build-app.sh                 # -> build/Knitted.app (ad-hoc signed, knitted app icon)
+open "build/Knitted.app"
 scripts/test.sh                      # unit tests (swift-testing)
 swift run knit-preview preview/      # render folder icons to PNG
 ```
@@ -40,8 +40,8 @@ Sources/
 │   ├── Palette/                  YarnColor, YarnPresets, IconSampler, PaletteExtractor
 │   ├── Folder/                   FolderIconRenderer (the knitted folder), RenderCache
 │   └── Frame/                    BorderPainter, CuffRenderer (knitted frames with ribbed corners)
-├── CozyFolders/                  the SwiftUI app
-│   ├── App/                      CozyFoldersApp (scene, commands), AppDelegate (Dock drops)
+├── Knitted/                      the SwiftUI app
+│   ├── App/                      KnittedApp (scene, commands), AppDelegate (Dock drops)
 │   ├── Model/                    Studio (@Observable state + actions), KnitDesign, Folders
 │   ├── Services/                 FolderKnitter (NSWorkspace.setIcon), WallpaperYarn, StudioStore
 │   └── Views/

@@ -1,11 +1,11 @@
 import SwiftUI
 
 @main
-struct CozyFoldersApp: App {
+struct KnittedApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        Window("Cozy Folders", id: "main") {
+        Window("Knitted", id: "main") {
             RootView()
                 .environment(appDelegate.studio)
                 .frame(minWidth: 940, minHeight: 700)
@@ -22,7 +22,7 @@ struct CozyFoldersApp: App {
                     .disabled(appDelegate.studio.staged.isEmpty)
             }
             CommandGroup(replacing: .appInfo) {
-                Button("About Cozy Folders") {
+                Button("About Knitted") {
                     NSApp.orderFrontStandardAboutPanel(options: [
                         .credits: NSAttributedString(string: "Knitted sweaters for your folders."),
                     ])

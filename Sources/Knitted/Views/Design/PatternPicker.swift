@@ -21,7 +21,7 @@ struct PatternPicker: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(family.rawValue)
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Cozy.softInk)
+                        .foregroundStyle(Theme.softInk)
                     LazyVGrid(columns: columns, spacing: 10) {
                         ForEach(PatternID.allCases.filter { $0.family == family }, id: \.self) { pattern in
                             ChoiceTile(title: pattern.displayName, selected: studio.design.pattern == .pattern(pattern)) {

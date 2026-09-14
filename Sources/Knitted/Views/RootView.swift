@@ -9,9 +9,9 @@ struct RootView: View {
         KnittedFrame(sweater: studio.previewSweater, thickness: 18, cornerRadius: 14, bleed: 4) {
             VStack(spacing: 0) {
                 // Title row, sharing its height with the traffic lights.
-                Text("Cozy Folders")
+                Text("Knitted")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Cozy.softInk)
+                    .foregroundStyle(Theme.softInk)
                     .frame(maxWidth: .infinity)
                     .frame(height: 36)
                 StitchedDivider().padding(.horizontal, 16)
@@ -29,7 +29,7 @@ struct RootView: View {
                         .frame(width: 350)
                 }
             }
-            .background(Cozy.paper)
+            .background(Theme.paper)
         }
         .overlay(alignment: .bottom) {
             if let toast = studio.toast {
@@ -42,7 +42,7 @@ struct RootView: View {
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: studio.toast)
         .ignoresSafeArea()
         .knittedWindowChrome(trafficLightOffset: CGSize(width: 12, height: 10))
-        .foregroundStyle(Cozy.ink)
+        .foregroundStyle(Theme.ink)
         .fontDesign(.rounded)
         .preferredColorScheme(.light)
     }

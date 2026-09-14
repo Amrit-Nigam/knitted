@@ -1,8 +1,8 @@
 import KnitCore
 import SwiftUI
 
-/// Wraps content in a knitted border with ribbed cuffs at the corners — the Cozy Borders look,
-/// knitted in whatever yarn and pattern is currently chosen.
+/// Wraps content in a knitted border with ribbed cuffs at the corners, knitted in whatever yarn
+/// and pattern is currently chosen.
 struct KnittedFrame<Content: View>: View {
     let sweater: FolderSweater
     var thickness: CGFloat = 16

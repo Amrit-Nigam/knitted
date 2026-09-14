@@ -5,23 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Cozy Folders</string>
-	<key>CFBundleExecutable</key>
-	<string>CozyFolders</string>
-	<key>CFBundleIconFile</key>
-	<string>AppIcon</string>
-	<key>CFBundleIdentifier</key>
-	<string>app.cozyfolders.CozyFolders</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>Cozy Folders</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.1.0</string>
-	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>Knitted</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -37,16 +21,32 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleExecutable</key>
+	<string>Knitted</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>app.knitted.Knitted</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Knitted</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>NSDesktopFolderUsageDescription</key>
-	<string>Cozy Folders changes the icons of folders you drop on it.</string>
+	<string>Knitted changes the icons of folders you drop on it.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>Cozy Folders changes the icons of folders you drop on it.</string>
+	<string>Knitted changes the icons of folders you drop on it.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
-	<string>Cozy Folders changes the icons of folders you drop on it.</string>
+	<string>Knitted changes the icons of folders you drop on it.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
