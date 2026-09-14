@@ -45,13 +45,17 @@ private struct ApplyBar: View {
                 .foregroundStyle(Theme.softInk)
                 .lineLimit(1)
             Button {
-                studio.apply()
+                Task { await studio.apply() }
             } label: {
-                Label(count == 0 ? "Add folders to knit" : "Knit \(count) Sweater\(count == 1 ? "" : "s")",
-                      systemImage: "scissors")
+                if studio.isKnitting {
+                    Label("Knitting…", systemImage: "hourglass")
+                } else {
+                    Label(count == 0 ? "Add folders to knit" : "Knit \(count) Sweater\(count == 1 ? "" : "s")",
+                          systemImage: "scissors")
+                }
             }
             .buttonStyle(KnitButtonStyle(kind: .primary, fullWidth: true))
-            .disabled(count == 0)
+            .disabled(count == 0 || studio.isKnitting)
             .help("⌘↩")
         }
         .padding(16)

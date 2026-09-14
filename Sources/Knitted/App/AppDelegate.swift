@@ -23,4 +23,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
     }
+
+    /// Quitting mid-knit would leave folders bare (old sweater off, new one not yet on), so
+    /// finish the current batch first.
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard studio.isKnitting else { return .terminateNow }
+        Task {
+            while studio.isKnitting {
+                try? await Task.sleep(for: .milliseconds(50))
+            }
+            NSApp.reply(toApplicationShouldTerminate: true)
+        }
+        return .terminateLater
+    }
 }

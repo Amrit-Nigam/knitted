@@ -16,5 +16,6 @@ let package = Package(
         // Renders folder icons to PNG for judging the knit by eye.
         .executableTarget(name: "knit-preview", dependencies: ["KnitCore"]),
         .testTarget(name: "KnitCoreTests", dependencies: ["KnitCore"]),
+        .testTarget(name: "KnittedTests", dependencies: ["Knitted", "KnitCore"]),
     ]
 )

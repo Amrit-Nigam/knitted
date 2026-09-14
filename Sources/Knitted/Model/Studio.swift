@@ -17,13 +17,17 @@ final class Studio {
     var focusedID: StagedFolder.ID?
     private(set) var wardrobe: [KnittedFolder]
     private(set) var toast: Toast?
+    /// True while sweaters are going on; the Knit button waits for it.
+    private(set) var isKnitting = false
 
     @ObservationIgnored private let store: StudioStore
+    @ObservationIgnored private let knitter: FolderKnitter
     @ObservationIgnored private let wallpaper = WallpaperYarn()
     @ObservationIgnored private var toastTask: Task<Void, Never>?
 
-    init(store: StudioStore = StudioStore()) {
+    init(store: StudioStore = StudioStore(), knitter: FolderKnitter = FolderKnitter()) {
         self.store = store
+        self.knitter = knitter
         design = store.loadDesign()
         wardrobe = store.loadWardrobe().filter { FileManager.default.fileExists(atPath: $0.path) }
     }
@@ -91,17 +95,16 @@ final class Studio {
 
     // MARK: Knitting
 
-    func apply() {
-        guard !staged.isEmpty else { return }
-        var done: [StagedFolder] = []
-        var failed: [StagedFolder] = []
-        for folder in staged {
-            if FolderKnitter.knit(folder.url, with: sweater(forFolderNamed: folder.name)) {
-                done.append(folder)
-            } else {
-                failed.append(folder)
-            }
-        }
+    func apply() async {
+        guard !staged.isEmpty, !isKnitting else { return }
+        isKnitting = true
+        defer { isKnitting = false }
+
+        let batch = staged
+        let jobs = batch.map { (url: $0.url, sweater: sweater(forFolderNamed: $0.name)) }
+        let succeeded = await knitter.knit(jobs)
+        let done = batch.filter { succeeded.contains($0.url) }
+        let failed = batch.filter { !succeeded.contains($0.url) }
 
         let now = Date()
         for folder in done {
@@ -109,9 +112,10 @@ final class Studio {
             wardrobe.insert(KnittedFolder(path: folder.url.path, date: now), at: 0)
         }
         store.saveWardrobe(wardrobe)
-        // Keep failures staged so they can be retried.
-        staged = failed
-        focusedID = failed.first?.id
+        // Keep failures staged so they can be retried; anything added mid-knit stays too.
+        let knittedIDs = Set(done.map(\.id))
+        staged.removeAll { knittedIDs.contains($0.id) }
+        if focused == nil || knittedIDs.contains(focusedID ?? "") { focusedID = staged.first?.id }
 
         if !failed.isEmpty {
             show("Couldn't change \(failed.map(\.name).joined(separator: ", ")). Check Knitted is allowed to access it.", .warning)
@@ -123,7 +127,7 @@ final class Studio {
     }
 
     func unknit(_ folder: KnittedFolder) {
-        FolderKnitter.unknit(folder.url)
+        knitter.unknit(folder.url)
         wardrobe.removeAll { $0.id == folder.id }
         store.saveWardrobe(wardrobe)
         show("\(folder.name) is back to its usual self", .done)
@@ -131,7 +135,7 @@ final class Studio {
 
     func unknitAll() {
         let count = wardrobe.count
-        for folder in wardrobe { FolderKnitter.unknit(folder.url) }
+        for folder in wardrobe { knitter.unknit(folder.url) }
         wardrobe.removeAll()
         store.saveWardrobe(wardrobe)
         show(count == 1 ? "Took off 1 sweater" : "Took off \(count) sweaters", .done)
